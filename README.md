@@ -297,7 +297,3 @@ Move all critical application records and validation logic into Supabase-backed 
 - For testing and experimental analysis, run tests and collect measurements. Clearly label any proposed tests that have not yet been performed.
 - Treat the current QR and attendance workflow as implemented prototype functionality, with future hardening still required.
 - Ensure the project report reflects that the system is not local-only; the main business data is connected to Supabase.
-
-## Final Statement
-
-Attende is a Supabase-first school attendance application. Authentication, user profiles, attendance records, leave requests, and role-based workflows are designed to operate through the Supabase backend and are intended to be managed as project data in the central database rather than as local-only device storage.
