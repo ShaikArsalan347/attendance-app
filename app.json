@@ -1,0 +1,39 @@
+{
+  "expo": {
+    "name": "Attende",
+    "slug": "attende",
+    "description": "This is an app developed to replace the traditional pen and paper attendance system with an easily accessible device. It consists of all features involved in traditional register system.",
+    "version": "1.0.1",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "package": "com.kalika.attende",
+      "versionCode": 1
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-font",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow Attende to access your camera to scan attendance QR codes.",
+          "recordAudioAndroid": false
+        }
+      ]
+    ]
+  }
+}
