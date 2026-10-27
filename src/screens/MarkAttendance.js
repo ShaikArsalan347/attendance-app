@@ -85,11 +85,6 @@ export default function MarkAttendance({ navigation }) {
       );
       return;
     }
-    if (!data.students.length) {
-      Alert.alert("No students", "Add students before starting attendance.");
-      return;
-    }
-
     setIsCreatingSession(true);
     try {
       const session = await createAttendanceSession(currentUser.id);

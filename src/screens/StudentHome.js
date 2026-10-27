@@ -88,12 +88,16 @@ export default function StudentHome({ navigation }) {
     hasScanned.current = true;
     setIsScannerOpen(false);
 
-    const result = await checkInWithQr(qrValue, currentUser);
-    setScanMessage(result.message || "Attendance marked present.");
-    Alert.alert(
-      result.ok ? "Checked in" : "Could not check in",
-      result.message || "Your attendance was marked present.",
-    );
+    try {
+      const result = await checkInWithQr(qrValue, currentUser);
+      const message = result.message || "Attendance marked present.";
+      setScanMessage(message);
+      Alert.alert(result.ok ? "Checked in" : "Could not check in", message);
+    } catch (error) {
+      const message = error.message || "Unable to check in. Please try again.";
+      setScanMessage(message);
+      Alert.alert("Could not check in", message);
+    }
   };
 
   return (
@@ -135,6 +139,11 @@ export default function StudentHome({ navigation }) {
                 facing="back"
                 barcodeScannerSettings={{ barcodeTypes: ["qr"] }}
                 onBarcodeScanned={handleQrScanned}
+                onMountError={({ message }) => {
+                  hasScanned.current = true;
+                  setIsScannerOpen(false);
+                  setScanMessage(message || "Could not access the camera.");
+                }}
               />
               <Pressable
                 accessibilityRole="button"

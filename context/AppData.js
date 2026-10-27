@@ -120,7 +120,7 @@ export function AppDataProvider({ children }) {
     await persist(next);
   };
 
-  const createAttendanceSession = async (teacherId, minExp = 5) => {
+  const createAttendanceSession = async (teacherId, minExp = 120) => {
     if (!teacherId)
       throw new Error("Sign in as a teacher to create a session.");
 
@@ -166,6 +166,13 @@ export function AppDataProvider({ children }) {
     try {
       payload = JSON.parse(qrValue);
     } catch {
+      return {
+        ok: false,
+        message: "This is not a valid Attende attendance QR.",
+      };
+    }
+
+    if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
       return {
         ok: false,
         message: "This is not a valid Attende attendance QR.",
