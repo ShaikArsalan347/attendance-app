@@ -1,6 +1,7 @@
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
@@ -43,7 +44,9 @@ function validDate(value: unknown): value is string {
     return false;
   }
   const date = new Date(`${value}T00:00:00.000Z`);
-  return Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === value;
+  return (
+    Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === value
+  );
 }
 
 Deno.serve(async (request) => {
@@ -146,7 +149,9 @@ Deno.serve(async (request) => {
       );
       const created = Array.isArray(data) ? data[0] : null;
       if (!response.ok || !created) {
-        return respond(500, { error: "Could not create the attendance session." });
+        return respond(500, {
+          error: "Could not create the attendance session.",
+        });
       }
 
       return respond(200, {
@@ -170,7 +175,9 @@ Deno.serve(async (request) => {
 
     if (body.action === "check-in") {
       if (profile.role !== "student") {
-        return respond(403, { error: "A student account is required to check in." });
+        return respond(403, {
+          error: "A student account is required to check in.",
+        });
       }
       if (typeof body.qrValue !== "string") {
         return respond(400, { error: "Attendance QR data is required." });
@@ -180,7 +187,9 @@ Deno.serve(async (request) => {
       try {
         payload = JSON.parse(body.qrValue);
       } catch {
-        return respond(400, { error: "This is not a valid Attende attendance QR." });
+        return respond(400, {
+          error: "This is not a valid Attende attendance QR.",
+        });
       }
       if (
         !payload ||
@@ -189,7 +198,9 @@ Deno.serve(async (request) => {
         payload.version !== 1 ||
         typeof payload.sessionId !== "string"
       ) {
-        return respond(400, { error: "This is not a valid Attende attendance QR." });
+        return respond(400, {
+          error: "This is not a valid Attende attendance QR.",
+        });
       }
 
       const sessionId = encodeURIComponent(payload.sessionId);
@@ -209,17 +220,22 @@ Deno.serve(async (request) => {
         session.expires_at !== payload.expiresAt ||
         Date.parse(session.expires_at) <= Date.now()
       ) {
-        return respond(400, { error: "This attendance QR is invalid or expired." });
+        return respond(400, {
+          error: "This attendance QR is invalid or expired.",
+        });
       }
 
       const studentId = encodeURIComponent(user.id);
-      const { response: existingResponse, data: existingCheckins } = await apiRequest(
-        supabaseUrl,
-        serviceRoleKey,
-        `/rest/v1/attendance_checkins?select=checked_in_at&session_id=eq.${sessionId}&student_id=eq.${studentId}&limit=1`,
-      );
+      const { response: existingResponse, data: existingCheckins } =
+        await apiRequest(
+          supabaseUrl,
+          serviceRoleKey,
+          `/rest/v1/attendance_checkins?select=checked_in_at&session_id=eq.${sessionId}&student_id=eq.${studentId}&limit=1`,
+        );
       if (!existingResponse.ok) {
-        return respond(500, { error: "Could not verify the attendance check-in." });
+        return respond(500, {
+          error: "Could not verify the attendance check-in.",
+        });
       }
       if (Array.isArray(existingCheckins) && existingCheckins.length) {
         return respond(200, {
@@ -250,7 +266,9 @@ Deno.serve(async (request) => {
         },
       );
       if (!checkinResponse.ok) {
-        return respond(409, { error: "You have already checked in for this session." });
+        return respond(409, {
+          error: "You have already checked in for this session.",
+        });
       }
 
       const { response: attendanceResponse } = await apiRequest(

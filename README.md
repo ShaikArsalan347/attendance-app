@@ -81,18 +81,18 @@ Attende is positioned as a school attendance workflow application rather than a 
 
 ### Implemented Technology
 
-| Area                               | Technology                                          | Use in Attende                                       |
-| ---------------------------------- | --------------------------------------------------- | ---------------------------------------------------- |
-| App                                | React Native 0.81, React 19                         | Shared mobile and web UI                             |
-| Framework/tooling                  | Expo SDK 58                                         | Development server, platform builds, and web export  |
-| Navigation                         | React Navigation native stack                       | Welcome and role-based app screens                   |
-| Authentication                     | Supabase Auth                                       | Email/password sign-in and persisted sessions        |
-| User profiles/account provisioning | Supabase Postgres and Edge Function                 | Profile lookup and role-checked account creation     |
-| Student roster and attendance      | Supabase Postgres                                   | Teacher-linked student roster and daily attendance  |
-| Local application data             | AsyncStorage                                        | Offline cache and pending attendance/leave writes    |
+| Area                               | Technology                                                     | Use in Attende                                       |
+| ---------------------------------- | -------------------------------------------------------------- | ---------------------------------------------------- |
+| App                                | React Native 0.81, React 19                                    | Shared mobile and web UI                             |
+| Framework/tooling                  | Expo SDK 58                                                    | Development server, platform builds, and web export  |
+| Navigation                         | React Navigation native stack                                  | Welcome and role-based app screens                   |
+| Authentication                     | Supabase Auth                                                  | Email/password sign-in and persisted sessions        |
+| User profiles/account provisioning | Supabase Postgres and Edge Function                            | Profile lookup and role-checked account creation     |
+| Student roster and attendance      | Supabase Postgres                                              | Teacher-linked student roster and daily attendance   |
+| Local application data             | AsyncStorage                                                   | Offline cache and pending attendance/leave writes    |
 | QR attendance                      | Expo Camera, Supabase Edge Function, `react-native-qrcode-svg` | Scan and validate expiring cloud attendance sessions |
-| Web support                        | React Native Web                                    | Browser preview and web export                       |
-| Android build service              | EAS Build                                           | Cloud Android builds                                 |
+| Web support                        | React Native Web                                               | Browser preview and web export                       |
+| Android build service              | EAS Build                                                      | Cloud Android builds                                 |
 
 The project is designed around Supabase as the main backend and storage layer. Local storage is not the primary source of truth for attendance, leave, or user records.
 
@@ -229,8 +229,8 @@ These are appropriate requirements to discuss and evaluate; not all are formally
 | Screen          | Purpose                                                                      |
 | --------------- | ---------------------------------------------------------------------------- |
 | Welcome         | Email/password sign-in and role-based routing                                |
-| Admin Home      | Add teachers, view synced teacher/student lists, review appeals               |
-| Teacher Home    | View synced assigned students, add students, mark attendance, review appeals  |
+| Admin Home      | Add teachers, view synced teacher/student lists, review appeals              |
+| Teacher Home    | View synced assigned students, add students, mark attendance, review appeals |
 | Student Home    | Show the student's own profile and attendance heatmap; open leave appeal     |
 | Add Teacher     | Collect teacher profile and credentials, then call account-creation function |
 | Add Student     | Collect student details and credentials, then call account-creation function |
@@ -246,19 +246,19 @@ There is no automated test suite currently defined in the repository. Tests and 
 
 ### Suggested Manual Test Cases
 
-| Test | Expected result |
-| --- | --- |
-| Sign in with valid admin credentials | Admin Home opens |
-| Sign in with teacher or student account | Correct role screen opens |
-| Sign in with invalid credentials | Readable error display; no role screen opens |
-| Admin creates teacher | Auth account and profile are created in Supabase |
-| Teacher creates student | Auth account and profile are created with proper teacher link |
-| Non-admin tries to create a teacher | Edge Function rejects the request |
-| Teacher records attendance | Supabase attendance record updates correctly |
-| Student views attendance | Only their own attendance data is shown |
-| Student submits leave appeal | Appeal is stored with `pending` status |
-| Teacher/admin decides on appeal | Appeal status updates in Supabase |
-| QR scan with valid or invalid session | Valid scans update attendance; invalid scans are rejected |
+| Test                                                                          | Expected result                                                                 |
+| ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| Sign in with valid admin credentials and an admin profile                     | Admin Home opens                                                                |
+| Sign in with a teacher/student account and matching profile                   | The correct role screen opens                                                   |
+| Sign in with invalid credentials                                              | A readable error is shown; no role screen opens                                 |
+| Admin creates a teacher                                                       | Auth account and teacher profile are created; teacher can sign in               |
+| Teacher creates a student                                                     | Auth account and student profile are created with the teacher link              |
+| Non-admin tries to create a teacher, or non-teacher tries to create a student | Edge Function rejects the request                                               |
+| Teacher marks a student present, absent, or on leave                          | Local attendance updates immediately and syncs to Supabase                      |
+| Student views their heatmap                                                   | Only their own cloud attendance statuses appear                                 |
+| Student submits a leave appeal                                                | Appeal is visible to the student and authorized staff with Pending status        |
+| Teacher/admin approves or rejects an appeal                                   | Cloud status updates; approval syncs Leave attendance                           |
+| QR scan with a valid, expired, or repeated session                            | Valid assigned-student scans sync Present once; invalid scans are rejected       |
 
 ### Experimental Analysis Guidance
 

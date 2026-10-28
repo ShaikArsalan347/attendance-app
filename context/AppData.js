@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useEffect, useRef, useState } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Crypto from "expo-crypto";
 import { supabase } from "../config/supabase";
@@ -74,7 +80,8 @@ export function AppDataProvider({ children }) {
   }, []);
 
   const persist = (update) => {
-    const next = typeof update === "function" ? update(dataRef.current) : update;
+    const next =
+      typeof update === "function" ? update(dataRef.current) : update;
     dataRef.current = next;
     setData(next);
     const write = persistQueue.current
@@ -119,11 +126,13 @@ export function AppDataProvider({ children }) {
         ...current,
         students: current.students.filter((s) => s.id !== studentId),
         leaves: (current.leaves || []).filter((l) => l.studentId !== studentId),
-        attendanceSessions: (current.attendanceSessions || []).map((session) => {
-          const checkIns = { ...(session.checkIns || {}) };
-          delete checkIns[studentId];
-          return { ...session, checkIns };
-        }),
+        attendanceSessions: (current.attendanceSessions || []).map(
+          (session) => {
+            const checkIns = { ...(session.checkIns || {}) };
+            delete checkIns[studentId];
+            return { ...session, checkIns };
+          },
+        ),
         attendance,
         pendingAttendance: (current.pendingAttendance || []).filter(
           (record) => record.student_id !== studentId,
@@ -156,7 +165,9 @@ export function AppDataProvider({ children }) {
       updated_at: new Date().toISOString(),
     }));
     const recordKeys = new Set(
-      cloudRecords.map((record) => `${record.student_id}:${record.attendance_date}`),
+      cloudRecords.map(
+        (record) => `${record.student_id}:${record.attendance_date}`,
+      ),
     );
 
     await persist((current) => ({
@@ -200,15 +211,21 @@ export function AppDataProvider({ children }) {
       throw new Error("Sign in as a teacher to create a session.");
     if (!supabase) throw new Error("Configure Supabase to create QR sessions.");
 
-    const { data: result, error } = await supabase.functions.invoke("sync-data", {
-      body: {
-        action: "create-session",
-        attendanceDate: todayKey(),
-        expiresMinutes: minExp,
+    const { data: result, error } = await supabase.functions.invoke(
+      "sync-data",
+      {
+        body: {
+          action: "create-session",
+          attendanceDate: todayKey(),
+          expiresMinutes: minExp,
+        },
       },
-    });
+    );
     if (error) {
-      throw await functionError(error, "Could not create the attendance session.");
+      throw await functionError(
+        error,
+        "Could not create the attendance session.",
+      );
     }
     if (!result?.id || !result?.qrValue) {
       throw new Error("The attendance session response was incomplete.");
@@ -245,9 +262,12 @@ export function AppDataProvider({ children }) {
       };
     }
 
-    const { data: result, error } = await supabase.functions.invoke("sync-data", {
-      body: { action: "check-in", qrValue },
-    });
+    const { data: result, error } = await supabase.functions.invoke(
+      "sync-data",
+      {
+        body: { action: "check-in", qrValue },
+      },
+    );
     if (error) {
       const requestError = await functionError(
         error,
@@ -339,7 +359,9 @@ export function AppDataProvider({ children }) {
       !["approved", "rejected"].includes(status) ||
       !["teacher", "admin"].includes(currentUser?.role)
     ) {
-      throw new Error("Only a teacher or administrator can review leave appeals.");
+      throw new Error(
+        "Only a teacher or administrator can review leave appeals.",
+      );
     }
     const leave = dataRef.current.leaves.find((item) => item.id === leaveId);
     if (!leave) throw new Error("Leave appeal not found.");
@@ -372,7 +394,11 @@ export function AppDataProvider({ children }) {
     if (supabase) {
       const { error } = await supabase
         .from("leave_appeals")
-        .update({ status, reviewed_at: reviewedAt, reviewed_by: currentUser.id })
+        .update({
+          status,
+          reviewed_at: reviewedAt,
+          reviewed_by: currentUser.id,
+        })
         .eq("id", leaveId);
       if (error) {
         console.warn("Leave review saved locally; cloud sync failed.", error);
@@ -506,7 +532,10 @@ export function AppDataProvider({ children }) {
           { body: { action: "admin-directory" } },
         );
         if (error) {
-          throw await functionError(error, "Could not load the school directory.");
+          throw await functionError(
+            error,
+            "Could not load the school directory.",
+          );
         }
         remoteTeachers = directory?.teachers || [];
         remoteStudents = directory?.students || [];
@@ -600,9 +629,7 @@ export function AppDataProvider({ children }) {
       await persist((current) => {
         const pendingAttendance = (current.pendingAttendance || []).filter(
           (record) =>
-            !uploadedKeys.has(
-              `${record.student_id}:${record.attendance_date}`,
-            ),
+            !uploadedKeys.has(`${record.student_id}:${record.attendance_date}`),
         );
         const pendingKeys = new Set(
           pendingAttendance.map(

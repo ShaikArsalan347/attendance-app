@@ -17,7 +17,10 @@ export default function LeaveList({ navigation }) {
           : "The review is queued and will sync when you are online.",
       );
     } catch (error) {
-      Alert.alert("Could not review appeal", error.message || "Please try again.");
+      Alert.alert(
+        "Could not review appeal",
+        error.message || "Please try again.",
+      );
     }
   };
 
@@ -33,7 +36,9 @@ export default function LeaveList({ navigation }) {
         <FlatList
           data={data.leaves}
           keyExtractor={(item) => item.id}
-          ListEmptyComponent={<Text style={styles.empty}>No leave appeals.</Text>}
+          ListEmptyComponent={
+            <Text style={styles.empty}>No leave appeals.</Text>
+          }
           renderItem={({ item }) => (
             <View style={styles.card}>
               <Text style={styles.cardTitle}>{item.studentName}</Text>
@@ -44,13 +49,24 @@ export default function LeaveList({ navigation }) {
               {item.status === "pending" && (
                 <View style={[styles.row, { marginTop: 12 }]}>
                   <Pressable
-                    style={[styles.btn, { flex: 1, marginRight: 8, marginBottom: 0, backgroundColor: colors.green }]}
+                    style={[
+                      styles.btn,
+                      {
+                        flex: 1,
+                        marginRight: 8,
+                        marginBottom: 0,
+                        backgroundColor: colors.green,
+                      },
+                    ]}
                     onPress={() => review(item.id, "approved")}
                   >
                     <Text style={styles.btnText}>Approve</Text>
                   </Pressable>
                   <Pressable
-                    style={[styles.btn, { flex: 1, marginBottom: 0, backgroundColor: colors.red }]}
+                    style={[
+                      styles.btn,
+                      { flex: 1, marginBottom: 0, backgroundColor: colors.red },
+                    ]}
                     onPress={() => review(item.id, "rejected")}
                   >
                     <Text style={styles.btnText}>Reject</Text>

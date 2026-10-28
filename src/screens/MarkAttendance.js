@@ -122,7 +122,10 @@ export default function MarkAttendance({ navigation }) {
     setIsRefreshing(true);
     try {
       await refreshData();
-      Alert.alert("Refreshed", "Attendance, students, and leave data are up to date.");
+      Alert.alert(
+        "Refreshed",
+        "Attendance, students, and leave data are up to date.",
+      );
     } catch (error) {
       Alert.alert("Refresh failed", error.message || "Please try again.");
     } finally {
