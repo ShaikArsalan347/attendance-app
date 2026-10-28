@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Attende",
-    "slug": "attende",
+    "slug": "attencence-app",
     "description": "This is an app developed to replace the traditional pen and paper attendance system with an easily accessible device. It consists of all features involved in traditional register system.",
     "version": "1.0.1",
     "orientation": "portrait",
@@ -14,13 +14,18 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "package": "com.kalika.attende",
-      "versionCode": 1
+      "versionCode": 1,
+      "permissions": [
+        "android.permission.CAMERA"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -34,6 +39,12 @@
           "recordAudioAndroid": false
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "31fc68b5-359b-428b-abdc-1a6f9148ac2c"
+      }
+    },
+    "owner": "asrsalan"
   }
 }
