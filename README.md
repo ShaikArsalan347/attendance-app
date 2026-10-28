@@ -64,36 +64,35 @@ Attende is positioned as a school attendance workflow application rather than a 
 
 ### Attendance
 
-1. A teacher opens Mark Attendance and loads the student list and today's attendance data from Supabase.
-2. Tapping a student toggles the status between Present, Absent, and Leave.
-3. The attendance record is stored in a Supabase table keyed to the student, date, and class/session context.
-4. A teacher may generate a QR session or use the attendance workflow available in the app; student check-in validation is linked to the same backend data model.
-5. A student can view their attendance history from their dashboard, with the status values drawn from Supabase-backed records.
+1. A teacher opens Mark Attendance. The app loads the local student list and today's records.
+2. Tapping a student's row toggles between Present and Absent. A student marked as on leave requires confirmation before changing the status.
+3. Saving writes attendance to AsyncStorage immediately and syncs each student/date record to Supabase. Failed uploads remain queued locally and retry at the next sign-in.
+4. A teacher creates a server-backed QR session valid for up to two hours. The `sync-data` Edge Function validates each student's check-in and syncs it to the daily attendance record.
+5. A student sees a year-style heatmap on Student Home. The grid uses only the signed-in student's ID: green means Present, red means Absent, blue means Leave, and dark means Unmarked.
 
 ### Leave Appeals
 
 1. A student enters a reason and submits an appeal.
-2. The appeal is stored in a Supabase table with a Pending status.
-3. An administrator or teacher reviews the request from the leave list.
-4. Approving or rejecting the appeal updates the record in Supabase.
-5. Approved leave can be reflected in the student's attendance record using the same backend data model.
+2. The appeal is stored locally and submitted to Supabase with a Pending status; failed submissions remain queued for retry.
+3. An administrator or the student's assigned teacher can approve or reject it from Leave Appeals.
+4. Approving an appeal also marks that student as on leave for the current date in local and cloud attendance.
 
 ## 3. Technology and Architecture
 
 ### Implemented Technology
 
-| Area | Technology | Use in Attende |
-| --- | --- | --- |
-| App | React Native 0.81, React 19 | Shared mobile and web UI |
-| Framework/tooling | Expo SDK 58 | Development server, mobile/web builds |
-| Navigation | React Navigation native stack | Welcome and role-based app screens |
-| Authentication | Supabase Auth | Email/password sign-in and session management |
-| User profiles and roles | Supabase Postgres | Profile lookup, role assignment, and account creation |
-| Database and backend | Supabase Database + Edge Functions | Attendance data, leave requests, user records |
-| Real-time/server logic | Supabase Edge Functions | Secure account provisioning and role checks |
-| QR attendance | Expo Camera, Expo Crypto, `react-native-qrcode-svg` | QR-based attendance flow |
-| Web support | React Native Web | Browser preview and web build |
-| Android build service | EAS Build | Cloud Android builds |
+| Area                               | Technology                                          | Use in Attende                                       |
+| ---------------------------------- | --------------------------------------------------- | ---------------------------------------------------- |
+| App                                | React Native 0.81, React 19                         | Shared mobile and web UI                             |
+| Framework/tooling                  | Expo SDK 58                                         | Development server, platform builds, and web export  |
+| Navigation                         | React Navigation native stack                       | Welcome and role-based app screens                   |
+| Authentication                     | Supabase Auth                                       | Email/password sign-in and persisted sessions        |
+| User profiles/account provisioning | Supabase Postgres and Edge Function                 | Profile lookup and role-checked account creation     |
+| Student roster and attendance      | Supabase Postgres                                   | Teacher-linked student roster and daily attendance  |
+| Local application data             | AsyncStorage                                        | Offline cache and pending attendance/leave writes    |
+| QR attendance                      | Expo Camera, Supabase Edge Function, `react-native-qrcode-svg` | Scan and validate expiring cloud attendance sessions |
+| Web support                        | React Native Web                                    | Browser preview and web export                       |
+| Android build service              | EAS Build                                           | Cloud Android builds                                 |
 
 The project is designed around Supabase as the main backend and storage layer. Local storage is not the primary source of truth for attendance, leave, or user records.
 
@@ -227,17 +226,17 @@ These are appropriate requirements to discuss and evaluate; not all are formally
 
 ## 5. Screens and Implementation Map
 
-| Screen | Purpose |
-| --- | --- |
-| Welcome | Email/password sign-in and role-based routing |
-| Admin Home | Add teachers, review appeal records, and view user lists |
-| Teacher Home | View students, add accounts, mark attendance, review leave requests |
-| Student Home | Show student profile and attendance details; open leave appeal flow |
-| Add Teacher | Collect teacher profile and credentials and call account-creation function |
-| Add Student | Collect student details and credentials and call account-creation function |
-| Mark Attendance | Toggle present/absent/leave and save the day's attendance |
-| Appeal Leave | Submit and review leave requests |
-| Leave List | Review and approve/reject leave requests |
+| Screen          | Purpose                                                                      |
+| --------------- | ---------------------------------------------------------------------------- |
+| Welcome         | Email/password sign-in and role-based routing                                |
+| Admin Home      | Add teachers, view synced teacher/student lists, review appeals               |
+| Teacher Home    | View synced assigned students, add students, mark attendance, review appeals  |
+| Student Home    | Show the student's own profile and attendance heatmap; open leave appeal     |
+| Add Teacher     | Collect teacher profile and credentials, then call account-creation function |
+| Add Student     | Collect student details and credentials, then call account-creation function |
+| Mark Attendance | Toggle present/absent and save the day's local attendance                    |
+| Appeal Leave    | Submit and view the current student's leave requests                         |
+| Leave List      | Review and approve/reject authorized leave requests                          |
 
 Navigation is configured in `App.js`; app state and data access are connected to Supabase-backed services and configuration files, including the Supabase client and Edge Function integration points.
 
@@ -267,23 +266,24 @@ No measured comparison or performance results are included with the source. A re
 
 ## 7. Limitations and Challenges
 
-- The project is still a prototype and requires proper Supabase configuration before full use.
-- The first administrator must be created manually in the Supabase dashboard.
-- Secure database policies and role validations must be fully tested.
-- QR-based attendance should be treated as a prototype unless server-side verification is hardened.
-- The current implementation may still require refinement for production-grade reliability and scaling.
-- No full automated test suite is currently provided.
+- Leave appeals, attendance, and directories sync through Supabase, with AsyncStorage used as a local cache and offline queue.
+- Apply all three migrations in `supabase/migrations/` and deploy `supabase/functions/sync-data` before using the cloud-backed features. Row-level security limits leave reads to students, their assigned teachers, and administrators; only teachers/admins can review appeals.
+- The account-creation function and Supabase project must be configured and deployed before those forms can create working accounts.
+- The first administrator must be provisioned manually in Supabase.
+- The current app is a prototype; school-wide data synchronization, database policies for attendance/leave, and production operations are not complete.
+- No face-recognition check-in is implemented.
+- No automated test suite or measured performance study is currently provided.
 
 ## 8. Future Scope
 
 Possible next features and improvements:
 
-1. Full cloud attendance and leave synchronization through Supabase tables and production-grade RLS.
-2. Optional face-based attendance, if privacy and legality are reviewed.
-3. Report generation, class summaries, and CSV/PDF export.
-4. Offline-first syncing with safe reconciliation when the device reconnects.
-5. Notifications and password recovery.
-6. Class management and teacher-to-class mapping.
+1. **Production operations:** add automated sync conflict tests, monitoring, and recovery for offline attendance and leave writes.
+2. **Optional face-based attendance:** only consider after a privacy, consent, accessibility, and legal review. Provide a non-biometric option such as QR/manual check-in; avoid retaining raw face images unless strictly necessary and approved.
+3. **Reports and exports:** add class summaries, date-range reports, and CSV/PDF export.
+4. **Offline-first sync:** queue teacher attendance updates offline and sync safely when online.
+5. **Notifications and account recovery:** notify users of leave decisions and support password reset.
+6. **Class management:** manage classes/sections and assign teachers to groups.
 
 ### Production Hardening (Future Work)
 

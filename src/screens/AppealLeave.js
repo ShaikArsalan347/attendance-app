@@ -15,13 +15,18 @@ export default function AppealLeave({ navigation }) {
       Alert.alert("Missing reason", "Please write why you need leave.");
       return;
     }
-    await addLeave({
+    const synced = await addLeave({
       studentId: currentUser.id,
       studentName: currentUser.name,
       reason: reason.trim(),
     });
     setReason("");
-    Alert.alert("Submitted", "Leave appeal sent to teacher/admin.");
+    Alert.alert(
+      synced ? "Submitted" : "Saved on this device",
+      synced
+        ? "Leave appeal sent to teacher/admin."
+        : "Leave appeal is queued and will sync when you are online.",
+    );
   };
 
   return (

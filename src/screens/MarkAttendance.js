@@ -1,6 +1,15 @@
 import { useEffect, useState } from "react";
-import { View, Text, Pressable, FlatList, Alert } from "react-native";
+import {
+  View,
+  Text,
+  Pressable,
+  FlatList,
+  Alert,
+  ActivityIndicator,
+} from "react-native";
 import QRCode from "react-native-qrcode-svg";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import { faArrowsRotate } from "@fortawesome/free-solid-svg-icons";
 import styles from "../styles/simple";
 import colors from "../../config/colors";
 import ScreenHeader from "../components/ScreenHeader";
@@ -24,12 +33,18 @@ function statusLabel(status) {
 }
 
 export default function MarkAttendance({ navigation }) {
-  const { data, currentUser, markAttendance, createAttendanceSession } =
-    useAppData();
+  const {
+    data,
+    currentUser,
+    markAttendance,
+    createAttendanceSession,
+    refreshData,
+  } = useAppData();
   const date = todayKey();
   const [records, setRecords] = useState({});
   const [activeSession, setActiveSession] = useState(null);
   const [isCreatingSession, setIsCreatingSession] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
     const existing = data.attendance[date] || {};
@@ -71,10 +86,14 @@ export default function MarkAttendance({ navigation }) {
       Alert.alert("No students", "Add students first.");
       return;
     }
-    await markAttendance(date, records);
-    Alert.alert("Saved", `Attendance saved for ${date}.`, [
-      { text: "OK", onPress: () => navigation.goBack() },
-    ]);
+    const synced = await markAttendance(date, records);
+    Alert.alert(
+      synced ? "Saved" : "Saved on this device",
+      synced
+        ? `Attendance saved to Supabase for ${date}.`
+        : "Cloud sync is pending. Sign in again while online to retry.",
+      [{ text: "OK", onPress: () => navigation.goBack() }],
+    );
   };
 
   const generateQr = async () => {
@@ -99,6 +118,18 @@ export default function MarkAttendance({ navigation }) {
     }
   };
 
+  const refresh = async () => {
+    setIsRefreshing(true);
+    try {
+      await refreshData();
+      Alert.alert("Refreshed", "Attendance, students, and leave data are up to date.");
+    } catch (error) {
+      Alert.alert("Refresh failed", error.message || "Please try again.");
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
   return (
     <View style={styles.screen}>
       <ScreenHeader
@@ -109,6 +140,28 @@ export default function MarkAttendance({ navigation }) {
         showLogout={false}
       />
       <View style={styles.content}>
+        <View style={styles.attendanceRefreshRow}>
+          <Pressable
+            accessibilityLabel="Refresh attendance and leave data"
+            accessibilityRole="button"
+            disabled={isRefreshing}
+            onPress={refresh}
+            style={styles.attendanceRefreshButton}
+          >
+            {isRefreshing ? (
+              <ActivityIndicator size="small" color="#176c68" />
+            ) : (
+              <FontAwesomeIcon
+                icon={faArrowsRotate}
+                size={14}
+                color="#176c68"
+              />
+            )}
+            <Text style={styles.attendanceRefreshText}>
+              {isRefreshing ? "Refreshing" : "Refresh"}
+            </Text>
+          </Pressable>
+        </View>
         <View style={styles.qrSessionPanel}>
           <Text style={styles.qrSessionTitle}>Student QR check-in</Text>
           <Text style={styles.qrSessionDescription}>

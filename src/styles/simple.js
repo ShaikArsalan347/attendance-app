@@ -185,6 +185,27 @@ export default StyleSheet.create({
     borderRadius: 8,
     backgroundColor: "#f5faf9",
   },
+  attendanceRefreshRow: {
+    alignItems: "flex-end",
+    marginBottom: 8,
+  },
+  attendanceRefreshButton: {
+    minHeight: 38,
+    paddingHorizontal: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    borderWidth: 1,
+    borderColor: "#b8d5d2",
+    borderRadius: 7,
+    backgroundColor: "#f5faf9",
+  },
+  attendanceRefreshText: {
+    color: "#176c68",
+    fontFamily: "Poppins_500Medium",
+    fontSize: 12,
+  },
   qrSessionTitle: {
     color: "#17324d",
     fontFamily: "Poppins_500Medium",
