@@ -244,7 +244,7 @@ Navigation is configured in `App.js`; app state and data access are connected to
 
 There is no automated test suite currently defined in the repository. Tests and performance numbers should only be reported if they are actually run and recorded.
 
-### Suggested Manual Test Cases
+### Test Cases
 
 | Test                                                                          | Expected result                                                                 |
 | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
