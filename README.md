@@ -242,32 +242,32 @@ Navigation is configured in `App.js`; app state and data access are connected to
 
 ## 6. Testing and Experimental Analysis
 
-There is no automated test suite currently defined in the repository. Tests and performance numbers should only be reported if they are actually run and recorded.
+There is no automated test suite currently defined in the repository. The following manual test cases have been tested, as reported by the project owner. Checked boxes indicate those manual checks were performed; they do not represent automated test coverage or independently measured performance results.
 
 ### Test Cases
 
-| Test                                                                          | Expected result                                                                 |
-| ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| Sign in with valid admin credentials and an admin profile                     | Admin Home opens                                                                |
-| Sign in with a teacher/student account and matching profile                   | The correct role screen opens                                                   |
-| Sign in with invalid credentials                                              | A readable error is shown; no role screen opens                                 |
-| Admin creates a teacher                                                       | Auth account and teacher profile are created; teacher can sign in               |
-| Teacher creates a student                                                     | Auth account and student profile are created with the teacher link              |
-| Non-admin tries to create a teacher, or non-teacher tries to create a student | Edge Function rejects the request                                               |
-| Teacher marks a student present, absent, or on leave                          | Local attendance updates immediately and syncs to Supabase                      |
-| Student views their heatmap                                                   | Only their own cloud attendance statuses appear                                 |
-| Student submits a leave appeal                                                | Appeal is visible to the student and authorized staff with Pending status        |
-| Teacher/admin approves or rejects an appeal                                   | Cloud status updates; approval syncs Leave attendance                           |
-| QR scan with a valid, expired, or repeated session                            | Valid assigned-student scans sync Present once; invalid scans are rejected       |
+| Tested | Test | Expected result |
+| --- | --- | --- |
+| ☑ | Sign in with valid admin credentials and an admin profile | Admin Home opens |
+| ☑ | Sign in with a teacher/student account and matching profile | The correct role screen opens |
+| ☑ | Sign in with invalid credentials | A readable error is shown; no role screen opens |
+| ☑ | Admin creates a teacher | Auth account and teacher profile are created; teacher can sign in |
+| ☑ | Teacher creates a student | Auth account and student profile are created with the teacher link |
+| ☑ | Non-admin tries to create a teacher, or non-teacher tries to create a student | Edge Function rejects the request |
+| ☑ | Teacher marks a student present, absent, or on leave | Local attendance updates immediately and syncs to Supabase |
+| ☑ | Student views their heatmap | Only their own cloud attendance statuses appear |
+| ☑ | Student submits a leave appeal | Appeal is visible to the student and authorized staff with Pending status |
+| ☑ | Teacher/admin approves or rejects an appeal | Cloud status updates; approval syncs Leave attendance |
+| ☑ | QR scan with a valid, expired, or repeated session | Valid assigned-student scans sync Present once; invalid scans are rejected |
 
 ### Experimental Analysis Guidance
 
-No measured comparison or performance results are included with the source. A report can propose a small usability study or compare the time needed to record attendance manually versus through the app, but such results must be clearly labeled as proposed or unverified.
+No measured comparison or performance results are included with the source. A report can propose a small usability study or compare the time needed to record attendance manually versus through the app; do not present measurements unless they have been collected and recorded.
 
 ## 7. Limitations and Challenges
 
 - Leave appeals, attendance, and directories sync through Supabase, with AsyncStorage used as a local cache and offline queue.
-- Apply all three migrations in `supabase/migrations/` and deploy `supabase/functions/sync-data` before using the cloud-backed features. Row-level security limits leave reads to students, their assigned teachers, and administrators; only teachers/admins can review appeals.
+- Apply all three migrations in `supabase/migrations/` and deploy `supabase/functions/sync-data` before using the cloud-backed features. Row-level security limits leave reads to students, their assigned teachers, and admins.
 - The account-creation function and Supabase project must be configured and deployed before those forms can create working accounts.
 - The first administrator must be provisioned manually in Supabase.
 - The current app is a prototype; school-wide data synchronization, database policies for attendance/leave, and production operations are not complete.
@@ -279,7 +279,7 @@ No measured comparison or performance results are included with the source. A re
 Possible next features and improvements:
 
 1. **Production operations:** add automated sync conflict tests, monitoring, and recovery for offline attendance and leave writes.
-2. **Optional face-based attendance:** only consider after a privacy, consent, accessibility, and legal review. Provide a non-biometric option such as QR/manual check-in; avoid retaining raw face images unless strictly necessary and approved.
+2. **Optional face-based attendance:** only consider after a privacy, consent, accessibility, and legal review. Provide a non-biometric option such as QR/manual check-in; avoid retaining raw face images.
 3. **Reports and exports:** add class summaries, date-range reports, and CSV/PDF export.
 4. **Offline-first sync:** queue teacher attendance updates offline and sync safely when online.
 5. **Notifications and account recovery:** notify users of leave decisions and support password reset.
@@ -294,6 +294,6 @@ Move all critical application records and validation logic into Supabase-backed 
 - Use Attende as the project name and treat Supabase as the primary system architecture.
 - The app is centered on authentication, profiles, attendance, and leave management; these should be the main report themes.
 - For architecture and ER diagrams, show Supabase Auth, profiles, attendance tables, and leave tables as the core backend model.
-- For testing and experimental analysis, run tests and collect measurements. Clearly label any proposed tests that have not yet been performed.
+- The manual test cases above are marked as tested based on the project owner's report. Automated tests and performance measurements are not claimed.
 - Treat the current QR and attendance workflow as implemented prototype functionality, with future hardening still required.
 - Ensure the project report reflects that the system is not local-only; the main business data is connected to Supabase.
