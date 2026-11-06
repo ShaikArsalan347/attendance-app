@@ -3,7 +3,18 @@ import { View, Text, Pressable, Alert, ScrollView } from "react-native";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import styles from "../styles/simple";
 import ScreenHeader from "../components/ScreenHeader";
+import UserProfileCard from "../components/UserProfileCard";
 import { useAppData } from "../../context/AppData";
+
+function formatHeatmapDate(dateKey) {
+  const [year, month, day] = dateKey.split("-").map(Number);
+  return new Date(year, month - 1, day).toLocaleDateString(undefined, {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+}
 
 export default function StudentHome({ navigation }) {
   const { currentUser, data, checkInWithQr } = useAppData();
@@ -111,19 +122,14 @@ export default function StudentHome({ navigation }) {
         style={styles.content}
         contentContainerStyle={styles.studentHomeContent}
       >
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>
-            {currentUser?.name || "Student profile"}
-          </Text>
-          {currentUser?.class ? (
-            <Text style={styles.cardMeta}>
-              Class {currentUser.class} · Sec {currentUser.section} · Roll{" "}
-              {currentUser.roll_no}
-            </Text>
-          ) : (
-            <Text style={styles.cardMeta}>Your class profile</Text>
-          )}
-        </View>
+        <UserProfileCard
+          name={currentUser?.name || "Student profile"}
+          detail={
+            currentUser?.class
+              ? `Class ${currentUser.class} · Section ${currentUser.section} · Roll ${currentUser.roll_no}`
+              : "Your class profile"
+          }
+        />
 
         <View style={styles.studentQrPanel}>
           <View style={styles.studentQrCopy}>
@@ -210,10 +216,17 @@ export default function StudentHome({ navigation }) {
                     {weeks.map((week, weekIndex) => (
                       <View key={weekIndex} style={styles.heatmapWeek}>
                         {week.map((day) => (
-                          <View
+                          <Pressable
                             key={day.date}
                             accessible
+                            accessibilityRole="button"
                             accessibilityLabel={`${day.date}: ${attendanceStatusLabel(day.status)}`}
+                            onPress={() =>
+                              Alert.alert(
+                                formatHeatmapDate(day.date),
+                                attendanceStatusLabel(day.status),
+                              )
+                            }
                             style={[
                               styles.heatmapCell,
                               attendanceStatusStyle(day.status),

@@ -110,9 +110,7 @@ function Welcome({ navigation }) {
         <View style={styles.intro}>
           <Text style={styles.eyebrow}>ATTENDANCE MANAGEMENT</Text>
           <Text style={styles.title}>Sign in</Text>
-          <Text style={styles.subtitle}>
-            Use your school account to continue.
-          </Text>
+          <Text style={styles.subtitle}>Use your account to continue.</Text>
         </View>
 
         <View style={styles.section}>
@@ -169,7 +167,7 @@ function Welcome({ navigation }) {
           )}
         </Pressable>
         <Text style={styles.footer}>
-          Accounts are managed by your school administrator.
+          Accounts are managed by your administrator.
         </Text>
       </ScrollView>
     </SafeAreaView>

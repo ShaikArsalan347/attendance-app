@@ -25,6 +25,13 @@ function todayKey() {
   return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
 }
 
+function todayIsoDate() {
+  const date = new Date();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${date.getFullYear()}-${month}-${day}`;
+}
+
 function localDateKey(value) {
   const [year, month, day] = value.split("-");
   return `${Number(year)}-${Number(month)}-${Number(day)}`;
@@ -216,7 +223,7 @@ export function AppDataProvider({ children }) {
       {
         body: {
           action: "create-session",
-          attendanceDate: todayKey(),
+          attendanceDate: todayIsoDate(),
           expiresMinutes: minExp,
         },
       },

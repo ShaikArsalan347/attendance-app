@@ -2,6 +2,7 @@ import { View, Text, Pressable, ScrollView } from "react-native";
 import styles from "../styles/simple";
 import ScreenHeader from "../components/ScreenHeader";
 import StudentCard from "../components/StudentCard";
+import UserProfileCard from "../components/UserProfileCard";
 import { useAppData } from "../../context/AppData";
 
 export default function TeacherHome({ navigation }) {
@@ -15,12 +16,10 @@ export default function TeacherHome({ navigation }) {
         navigation={navigation}
       />
       <ScrollView style={styles.content}>
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>{currentUser?.name || "Teacher"}</Text>
-          <Text style={styles.cardMeta}>
-            Subject: {currentUser?.subject || "Not specified"}
-          </Text>
-        </View>
+        <UserProfileCard
+          name={currentUser?.name || "Teacher"}
+          detail={`Subject: ${currentUser?.subject || "Not specified"}`}
+        />
 
         <Pressable
           style={styles.btn}
