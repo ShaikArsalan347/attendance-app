@@ -110,11 +110,7 @@ export default function ScreenHeader({
               onPress={logout}
               style={styles.userMenuLogout}
             >
-              <FontAwesomeIcon
-                icon={faSignOutAlt}
-                size={16}
-                color="#b42318"
-              />
+              <FontAwesomeIcon icon={faSignOutAlt} size={16} color="#b42318" />
               <Text style={styles.userMenuLogoutText}>Log out</Text>
             </Pressable>
           </SafeAreaView>
